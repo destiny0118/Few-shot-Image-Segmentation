@@ -5,9 +5,10 @@ from os.path import splitext
 from PIL import Image
 from torchvision import transforms
 import logging
+import torchvision.transforms.functional as TF
 
 class Augment():
-    def __init__(self,img_dir,aug_dir,aug_op,aug_suffix,mask_dir,mask_suffix='_mask'):
+    def __init__(self,img_dir,aug_dir,aug_op,aug_suffix,mask_dir,mask_suffix='_mask',mask_aug=False):
         # 封装图片路径，获取文件
         self.img_dir=Path(img_dir)
         self.aug_dir=aug_dir
@@ -15,9 +16,9 @@ class Augment():
         self.aug_suffix=aug_suffix
         self.mask_dir=Path(mask_dir)
         self.mask_suffix=mask_suffix
+        self.mask_aug=mask_aug
 
         self.ids=[splitext(filename)[0] for filename in listdir(img_dir)]
-        print(len(self.ids))
         # self.ids += [splitext(filename)[0] for filename in listdir(img_dir)]
         # print(len(self.ids))
 
@@ -27,8 +28,7 @@ class Augment():
     '''
     def apply(self,index,image,mask):
         aug_img=self.aug_op(image)
-        color_aug=["_RandomInvert","_CJ_HUE","_CJ_Contrast"]
-        if self.aug_suffix not in color_aug:
+        if self.mask_aug:
             aug_mask=self.aug_op(mask)
         else:
             aug_mask=mask

@@ -7,18 +7,22 @@ import numpy as np
 
 '''
     对图像分割边缘划分的准确率
+    edge_weight: 边缘权值
+    outline_weight: 轮廓权重
 '''
-def edge_loss(mask_predit:Tensor,mask_true:Tensor,device,weight=50,true_edge=True):
+
+
+def edge_loss(mask_predit: Tensor, mask_true: Tensor, device, edge_weight=50, outline_weight=0, save_mask=False):
     '''
         将分割图中的实例部分为1，其余为0
     '''
     # print(mask_true.size(),mask_predit.size())
-    # tensor=tensor.to(device)
-    cmp=mask_true>0
-    cmp=cmp+0
-    cmp=cmp.clone().type(torch.int)
 
-    if len(list(cmp.shape))==2:
+    cmp = mask_true > 0
+    cmp = cmp + 0
+    cmp = cmp.clone().type(torch.int)
+
+    if len(list(cmp.shape)) == 2:
         # 左右填充数据
         l_r_p = torch.zeros((cmp.shape[0], 1), dtype=torch.int).cuda()
 
@@ -42,8 +46,6 @@ def edge_loss(mask_predit:Tensor,mask_true:Tensor,device,weight=50,true_edge=Tru
         up_1 = torch.cat((cmp, u_d_p), 1)[:, 1:, :].cuda()
         down_1 = torch.cat((u_d_p, cmp), 1)[:, :-1, :].cuda()
 
-
-
     '''
         获取边缘
     '''
@@ -57,46 +59,55 @@ def edge_loss(mask_predit:Tensor,mask_true:Tensor,device,weight=50,true_edge=Tru
     ans = torch.bitwise_or(ans, c).cuda()
     ans = torch.bitwise_or(ans, d).cuda()
 
-    edge=ans.cuda()
-    if(true_edge):
-        edge=torch.bitwise_and(cmp,edge)
+    '''边缘和轮廓'''
+    outline_edge = ans.cuda()
+    edge = torch.bitwise_and(cmp, outline_edge)
+    outline = torch.bitwise_xor(outline_edge, edge)
 
-    # print(edge.sum())
+    print(outline_edge)
+    print(edge)
+    print(outline)
+
     '''
         给边缘加权
+        TP: 真正例（预测为边缘，实际为边缘）
+        FP：假正例（预测为边缘，实际为轮廓）
     '''
-    # TP = edge * mask_predit
-    # print(TP.sum(), edge.sum(),TP.sum()/edge.sum())
-    edge=edge*weight
-    TP=edge*mask_predit
-    # print(TP.sum(),edge.sum(),TP.sum()/edge.sum())
+    edge = edge * edge_weight
+    TP = edge * mask_predit
 
-    return 1-TP.sum()/edge.sum()
+    outline=outline*outline_weight
+    FP=outline*mask_predit
 
-    '''
-        转换为PIL格式图片
-    '''
-    # to_image=transforms.ToPILImage()
-    # img=to_image(edge)
-    # img.save("edge.gif")
-    # plt.imshow(img)
-    # plt.show()
+    # print("TP:", TP)
+    # print(TP.sum(), edge.sum(), TP.sum() / edge.sum())
+    # print("FP:",FP)
+    # print(FP.sum(),outline.sum(),0 if outline_weight==0 else FP.sum()/outline.sum())
+    # print(10+ (0 if outline_weight==0 else FP.sum()/outline.sum()))
 
 
+    # 转换为PIL格式图片
+    if save_mask:
+        to_image = transforms.ToPILImage()
+        img = to_image(edge)
+        img.save("edge.gif")
+        plt.imshow(img)
+        plt.show()
 
+    return 1 - TP.sum() / edge.sum()+(0 if outline_weight==0 else FP.sum()/outline.sum())
 
     # if(save):
 
 
 def image_trans(img_path):
-    img=Image.open(img_path)
+    img = Image.open(img_path)
     # PIL格式转化为ndarray格式
-    img_narray=np.asarray(img)
-    if(img_narray.ndim>2):
-        img_narray=img_narray.transpose((2,0,1))
+    img_narray = np.asarray(img)
+    if (img_narray.ndim > 2):
+        img_narray = img_narray.transpose((2, 0, 1))
 
     # img_narray=img_narray/255
-    img_tensor=torch.as_tensor(img_narray)
+    img_tensor = torch.as_tensor(img_narray)
     print(type(img_tensor))
 
     # plt.imshow(img)
@@ -104,11 +115,25 @@ def image_trans(img_path):
     return img_tensor
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    img_tesnsor=image_trans("1_mask.gif")
+    img_tesnsor = image_trans("1_mask.gif")
 
-    img_tesnsor=img_tesnsor.to(device=device)
+    img_tesnsor = img_tesnsor.to(device=device)
 
     print(img_tesnsor.size())
-    edge_loss(img_tesnsor,img_tesnsor,device,weight=50)
+
+    true_mask = torch.tensor([[0, 0, 0, 0, 0],
+                              [0, 0, 1, 0, 0],
+                              [0, 1, 1, 1, 0],
+                              [0, 0, 1, 0, 0],
+                              [0, 0, 0, 0, 0]], dtype=torch.int)
+
+    pred_mask = torch.tensor([[0, 0, 0, 0, 0],
+                              [0, 0, 1, 1, 1],
+                              [0, 0, 1, 1, 0],
+                              [0, 0, 1, 0, 0],
+                              [0, 0, 0, 0, 0]], dtype=torch.int)
+    true_mask = true_mask.to(device=device)
+    pred_mask = pred_mask.to(device=device)
+    edge_loss(pred_mask, true_mask, device, edge_weight=50,outline_weight=10)
