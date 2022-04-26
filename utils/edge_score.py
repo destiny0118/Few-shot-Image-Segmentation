@@ -64,9 +64,9 @@ def edge_loss(mask_predit: Tensor, mask_true: Tensor, device, edge_weight=50, ou
     edge = torch.bitwise_and(cmp, outline_edge)
     outline = torch.bitwise_xor(outline_edge, edge)
 
-    print(outline_edge)
-    print(edge)
-    print(outline)
+    # print(outline_edge)
+    # print(edge)
+    # print(outline)
 
     '''
         给边缘加权
@@ -93,8 +93,10 @@ def edge_loss(mask_predit: Tensor, mask_true: Tensor, device, edge_weight=50, ou
         img.save("edge.gif")
         plt.imshow(img)
         plt.show()
-
-    return 1 - TP.sum() / edge.sum()+(0 if outline_weight==0 else FP.sum()/outline.sum())
+    if outline_weight==0:
+        return 1 - TP.sum() / edge.sum()
+    else:
+        return 1 - TP.sum() / edge.sum()+ FP.sum()/outline.sum()
 
     # if(save):
 

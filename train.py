@@ -31,11 +31,11 @@ dir_checkpoint = Path('./checkpoints/')
 
 
 def train_net(net,
+              model_name,
               device,
               aug_index,
               aug_fun,
               aug_name,
-              mask_trans,
               isAugment=False,
               epochs: int = 5,
               batch_size: int = 1,
@@ -46,19 +46,15 @@ def train_net(net,
               edge_weight: int = 50,
               outline_weight: int = 0,
               img_scale: float = 1,
+
               amp: bool = False):
 
     if isAugment:
         del_file(dir="./data/aug_imgs/")
-        for i, value in enumerate(aug_index):
-            if value:
-                if aug_name[i] in mask_trans:
-                    augment = Augment(train_img, "./data/aug_imgs/", aug_op=aug_fun[i], aug_suffix=aug_name[i],
-                                      mask_dir="./data/masks/",mask_aug=True)
-                else:
-                    augment = Augment(train_img, "./data/aug_imgs/", aug_op=aug_fun[i], aug_suffix=aug_name[i],
-                                      mask_dir="./data/masks/", mask_aug=False)
-                augment.process()
+        for i in aug_index:
+            augment = Augment(train_img, "./data/aug_imgs/", aug_op=aug_fun[i], aug_suffix=aug_name[i],
+                              mask_dir="./data/masks/")
+            augment.process()
 
     train_set = CarvanaDataset(train_img, dir_mask, img_scale, augment=isAugment, aug_dir=aug_img)
     n_train = train_set.__len__()
@@ -83,8 +79,12 @@ def train_net(net,
         aug_index=[False]*len(aug_index)
 
     data={}
-    for i in range(len(aug_index)):
-        data[aug_name[i]] = [aug_index[i]]
+    data['model']=[model_name]
+    for i in range(len(aug_name)):
+        if i in aug_index and isAugment:
+            data[aug_name[i]]=True
+        else:
+            data[aug_name[i]] = False
     data['edgeLoss']=[edgeloss]
     data['edge_weight']=[edge_weight]
     data['outline_weight']=[outline_weight]
@@ -93,15 +93,6 @@ def train_net(net,
 
     tbl = wandb.Table(data=df)
     experiment.log({'augment_table': tbl})
-    # if isAugment:
-    #     tbl.add_row(1,2,3,4)
-    # else:
-    #     tmp=[False]*len(aug_index)
-    #     tbl.add_row(1,2,3,4)
-    # tbl.add_column("edgeLoss",edgeloss)
-    # tbl.add_column("edge_weight",edge_weight)
-    # tbl.add_column("outline_weight",outline_weight)
-    # experiment.log({'augment_table': tbl})
 
     logging.info(f'''Starting training:
         Epochs:          {epochs}
@@ -142,14 +133,19 @@ def train_net(net,
 
                 with torch.cuda.amp.autocast(enabled=amp):
                     masks_pred = net(images)
-                    # print("****", true_masks.size(), masks_pred.size())
-
-                    loss = criterion(masks_pred, true_masks) \
-                           + dice_loss(F.softmax(masks_pred, dim=1).float(),
-                                       F.one_hot(true_masks, net.n_classes).permute(0, 3, 1, 2).float(),
-                                       multiclass=True) \
-                           + (edge_loss(mask_predit=torch.softmax(masks_pred, dim=1).argmax(dim=1)[0],
-                                        mask_true=true_masks[0], device=device) if edgeloss else 0)
+                    # true_masks:[n,h,w]   masks_pred:[n,nclasses,h,w]
+                    if edgeloss:
+                        loss = criterion(masks_pred, true_masks) \
+                               + dice_loss(F.softmax(masks_pred, dim=1).float(),
+                                           F.one_hot(true_masks, net.n_classes).permute(0, 3, 1, 2).float(),
+                                           multiclass=True) \
+                               + edge_loss(mask_predit=torch.softmax(masks_pred, dim=1).argmax(dim=1)[0],
+                                            mask_true=true_masks[0], device=device,edge_weight=edge_weight,outline_weight=outline_weight)
+                    else:
+                        loss = criterion(masks_pred, true_masks) \
+                               + dice_loss(F.softmax(masks_pred, dim=1).float(),
+                                           F.one_hot(true_masks, net.n_classes).permute(0, 3, 1, 2).float(),
+                                           multiclass=True)
                 #     [1,2,w,h]->[w,h]
                 '''
                 Each parameter’s gradient (.grad attribute) should be unscaled before the optimizer updates 
@@ -206,13 +202,12 @@ def train_net(net,
                     if value:
                         aug_suffix += aug_name[i]
 
-            loss_suffix=""
             if edgeloss:
                 torch.save(net.state_dict(),
-                           str(dir_checkpoint / 'model_epoch{}{}_edge{}_outline{}.pth'.format(epoch + 1, aug_suffix,edge_weight,outline_weight)))
+                           str(dir_checkpoint / '{}_epoch{}{}_edge{}_outline{}.pth'.format(model_name, + 1, aug_suffix,edge_weight,outline_weight)))
             else:
                 torch.save(net.state_dict(),
-                            str(dir_checkpoint / 'model_epoch{}{}.pth'.format(epoch + 1,aug_suffix)))
+                            str(dir_checkpoint / '{}_epoch{}{}.pth'.format(model_name, + 1,aug_suffix)))
             logging.info(f'Checkpoint {epoch + 1} saved!')
 
 
@@ -254,31 +249,44 @@ if __name__ == '__main__':
         logging.info(f'Model loaded from {args.load}')
 
     # 要进行的增强操作
-    aug_index = [False, True, False, False]
+    isAugment=False
+    aug_index = [4]
     aug_fun = [TF.invert,
                TF.hflip,
+               TF.rotate,
+               TF.affine,           #3 scale=1.5
+               TF.affine,           #4 translateX=200
+               transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 5)),
                transforms.ColorJitter(brightness=0, contrast=0, saturation=0, hue=0.5),
                transforms.ColorJitter(brightness=0, contrast=0.5, saturation=0, hue=0)]
-    aug_name = ["_invert", "_hflip", "_ColorJitter_hue0.5", "_ColorJitter_contrast0.5"]
-    # 是否需要对分割图进行转换
-    mask_trans = ["_hflip"]
+    aug_name = ["_invert", "_hflip","_rotate", "_affineScale","_translateX","_GaussianBlur","_ColorJitter_hue0.5", "_ColorJitter_contrast0.5"]
+    '''
+        是否需要对分割图变换
+    '''
+    mask_trans = ["_hflip","_rotate"]
+
+    edgeloss=False
+    edge_weight = 50
+    outline_weight = 50
+
+    model_name="U-net"
 
     net.to(device=device)
     try:
         train_net(net=net,
-                  isAugment=False,
+                  isAugment=isAugment,
                   aug_index=aug_index,
                   aug_fun=aug_fun,
                   aug_name=aug_name,
-                  mask_trans=mask_trans,
-                  epochs=10,
+                  epochs=5,
                   batch_size=1,
                   learning_rate=1e-5,
                   device=device,
                   img_scale=0.5,
-                  edgeloss=False,
-                  edge_weight=50,
-                  outline_weight=0,
+                  edgeloss=edgeloss,
+                  edge_weight=edge_weight,
+                  outline_weight=outline_weight,
+                  model_name=model_name,
                   amp=args.amp)
     except KeyboardInterrupt:
         torch.save(net.state_dict(), 'INTERRUPTED.pth')

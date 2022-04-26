@@ -1,0 +1,180 @@
+% !TEX TS-program = xelatex
+% !TEX encoding = UTF-8 Unicode
+
+\documentclass[AutoFakeBold]{LZUThesis}
+
+
+
+\begin{document}
+%=====%
+%
+%封皮页填写内容
+%
+%=====%
+
+% 标题样式 使用 \title{{}}; 使用时必须保证至少两个外侧括号
+%  如： 短标题 \title{{第一行}},  
+% 	      长标题 \title{{第一行}{第二行}}
+%             超长标题\tiitle{{第一行}{...}{第N行}}
+
+\title{{中国分析哲学研究（2021新模板）}}
+
+
+
+% 标题样式 使用 \entitle{{}}; 使用时必须保证至少两个外侧括号
+%  如： 短标题 \entitle{{First row}},  
+% 	      长标题 \entitle{{First row}{ Second row}}
+%             超长标题\entitle{{First row}{...}{ Next N row}}
+% 注意：  英文标题多行时 需要在开头加个空格 防止摘要标题处英语单词粘连。
+\entitle{{Studies in Analytic }{Philosophy in China}}
+
+% 我曾见证无数人不改这几项，或者不改完全……，下一个会不会是你？
+\author{你的名字}
+\major{你的专业}
+\advisor{你的导师的名字}
+\college{你的学院}
+\grade{你的年级}
+
+
+
+\maketitle
+\thispagestyle{empty}
+
+%======%
+%诚信说明页
+%授权说明书
+%======%
+% 如果超出边界，可以调整签字的宽度，现在是40，如果你不用，把下面的注释就好
+
+% 你的签名
+\mysignature{
+    % \raisebox{-5pt}{
+        \includegraphics[width=40pt]{signature.pdf}
+    % }
+}
+% 你手写的日期
+\mytime{
+    % \raisebox{-5pt}{
+        \includegraphics[width=40pt]{signature.pdf}
+    % }
+}
+% 老师的手写签名
+\supervisorsignature{
+    % \raisebox{-5pt}{
+        \includegraphics[width=40pt]{signature.pdf}
+    % }
+}
+% 老师手写的时间
+\teachertime{
+    % \raisebox{-5pSt}{
+        \includegraphics[width=40pt]{signature.pdf}
+    % }
+}
+% 老师手写的成绩
+\recommendedgrade{
+    % \raisebox{-5pt}{
+        \includegraphics[width=40pt]{signature.pdf}
+    % }
+}
+\makestatement
+
+%=====%
+%论文（设计）成绩
+%=====%
+% 下面这些注释掉可以去掉成绩、评语什么的
+\supervisorcomment{导师评价你人很好}
+
+\recommendedgrade{80}
+
+\supervisorsignature{
+    \raisebox{-10pt}{
+        \includegraphics[width=60pt]{signature.pdf}
+    }
+}
+
+\committeecomment{优秀}
+
+\finalgrade{100}
+% 上面这些注释掉可以去掉成绩、评语什么的
+
+\Grade %这一句才是成绩页
+
+
+\frontmatter
+
+%英文摘要
+\EnAbstract{This essay explores the history of studies in analytical philosophy in China since the beginning of the last century, by dividing into three phases. It shows that, in these phases, analytic philosophy was always at a disadvantage in confronting serious challenges coming from both Chinese traditional philosophy and modern philosophical trends. The authors argue that Chinese philosophers have both done preliminary studies and offered their own analyses of various problems as well as some new applications of analytic philosophy especially in the latest period. Meanwhile, Chinese traditional philosophy was always trying to adjust its cultural mentality in the struggle with analytic philosophy, and accommodated in its own way the rationalistic spirit and scientific method represented in analytic philosophy.}
+{analytical philosophy; Chinese philosophers; philosophical analysis;
+dialogue in philosophy.}
+
+%中文摘要
+\ZhAbstract{本文探讨了20世纪初以来的中国分析哲学研究史，将其分为三个时期。在这三个时期，分析哲学在面对中国传统哲学和现代哲学思潮的严重挑战时，一直处于不利地位。作者提出，中国哲学家不仅对分析哲学进行了初步研究，而且对分析哲学的各种问题，特别是分析哲学在最近时期新的应用进行了分析。同时，中国传统哲学在与分析哲学的斗争中一直在调整其文化心理，以其特有的方式容纳分析哲学的理性精神和科学方法。}
+{分析哲学；中国哲学家；哲学分析；哲学对话}
+
+%生成目录
+\tableofcontents
+%文章主体
+\mainmatter
+
+
+\Intro{
+	其实我推荐绪论写在正文里！！作为第一章
+
+	这里是绪论，也可以说是引言\\
+
+	重要的事情说一遍吧。。。注意啊，如果你编译以后\textbf{没有参考文献}，那是因为编译需要四步走：
+	$$XeLaTeX -->BibTeX --> XeLaTeX-->XeLaTeX$$
+	
+	没看懂？百度去，这都不会你就开始去用latex写论文了。。。
+	算了，给你找几个教程吧\\
+	\url{http://blog.sina.com.cn/s/blog_4ddef8f80100kn21.html}\\
+	\url{https://blog.csdn.net/qq_36718092/article/details/89361629}\\
+
+
+	额，或许还没看懂，小白的话还是用vscode吧，配置简单一些，
+
+	\url{https://zhuanlan.zhihu.com/p/38178015}
+
+}
+
+
+% =======正文从第一章开始
+\setcounter{chapter}{0}
+
+\chapter{这里写章节的名字}
+
+这里写这一章节的内容
+
+\section{这里是二级标题}
+这里是文章内容\cite{tussyadiah2015hotels}
+
+\subsection{这里是三级标题}
+这里是文章内容\cite{partl2016}
+
+
+
+%论文后部
+\backmatter
+
+
+%=======%
+%引入参考文献文件
+%=======%
+\bibdatabase{bib/database}%bib文件名称 仅修改bib/ 后部分
+\printbib
+% \nocite{*} %显示数据库中有的，但是正文没有引用的文献
+
+
+\Appendix
+
+
+这里是附录页，附上你的程序或必要的相关知识
+
+{\bfseries 编译方式:} XeLaTeX -->BibTeX --> XeLaTeX-->XeLaTeX
+
+
+\Thanks
+这里是致谢页，你可以在这里致谢你的舍友，老师，朋友，或者我。
+
+
+\end{document}

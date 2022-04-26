@@ -8,7 +8,7 @@ import logging
 import torchvision.transforms.functional as TF
 
 class Augment():
-    def __init__(self,img_dir,aug_dir,aug_op,aug_suffix,mask_dir,mask_suffix='_mask',mask_aug=False):
+    def __init__(self,img_dir,aug_dir,aug_op,aug_suffix,mask_dir,mask_suffix='_mask'):
         # 封装图片路径，获取文件
         self.img_dir=Path(img_dir)
         self.aug_dir=aug_dir
@@ -16,7 +16,6 @@ class Augment():
         self.aug_suffix=aug_suffix
         self.mask_dir=Path(mask_dir)
         self.mask_suffix=mask_suffix
-        self.mask_aug=mask_aug
 
         self.ids=[splitext(filename)[0] for filename in listdir(img_dir)]
         # self.ids += [splitext(filename)[0] for filename in listdir(img_dir)]
@@ -27,11 +26,22 @@ class Augment():
         
     '''
     def apply(self,index,image,mask):
-        aug_img=self.aug_op(image)
-        if self.mask_aug:
-            aug_mask=self.aug_op(mask)
+        # 是否需要对mask图进行增强操作
+        if self.aug_suffix=="_rotate":
+            aug_img=self.aug_op(image,30)
+            aug_mask=self.aug_op(mask,30)
+        elif self.aug_suffix=="_affineScale":
+            aug_img=self.aug_op(image,angle=0,translate=[0,0],scale=1.5,shear=0)
+            aug_mask=self.aug_op(mask,angle=0,translate=[0,0],scale=1.5,shear=0)
+        elif self.aug_suffix=="_translateX":
+            aug_img = self.aug_op(image, angle=0, translate=[200, 0], scale=1.0, shear=0)
+            aug_mask = self.aug_op(mask, angle=0, translate=[200, 0], scale=1.0, shear=0)
         else:
-            aug_mask=mask
+            aug_img = self.aug_op(image)
+            if self.aug_suffix =="_hflip":
+                aug_mask=self.aug_op(mask)
+            else:
+                aug_mask=mask
             # print(self.aug_suffix+"*****")
         aug_img.save(self.aug_dir+index+self.aug_suffix+".jpg")
         aug_mask.save(str(self.mask_dir)+"/"+index+self.aug_suffix+"_mask"+".gif")

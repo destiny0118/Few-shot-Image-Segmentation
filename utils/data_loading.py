@@ -7,7 +7,8 @@ import numpy as np
 import torch
 from PIL import Image
 from torch.utils.data import Dataset,DataLoader
-
+from torchvision import  transforms
+from matplotlib import pyplot as plt
 
 class CarvanaDataset(Dataset):
     def __init__(self, images_dir: str, masks_dir: str, scale: float = 1.0, mask_suffix: str = '_mask',augment:bool=False,aug_dir:str='',aug_op:str=''):
@@ -82,18 +83,16 @@ class CarvanaDataset(Dataset):
         mask = self.preprocess(mask, self.scale, is_mask=True)
 
 
+        # print(Y.shape,torch.as_tensor(mask).shape)
+
         # return {
         #     'image': torch.as_tensor(img.copy()).float().contiguous(),
         #     'mask': torch.as_tensor(mask.copy()).long().contiguous()
         # }
         return {
-            'image': torch.as_tensor(img.copy()),
-            'mask': torch.as_tensor(mask.copy())
+            'image': torch.as_tensor(img.copy()).contiguous(),
+            'mask': torch.as_tensor(mask.copy()).contiguous()
         }
-        # return {
-        #     'image': img,
-        #     'mask': mask
-        # }
 
 
 if  __name__=="__main__":
@@ -103,9 +102,16 @@ if  __name__=="__main__":
     dir_mask = Path('../data/masks/')
     img_scale=1.0
 
-    train_set=CarvanaDataset(train_img,dir_mask,img_scale,augment=False,aug_dir=aug_img)
-    val_set=CarvanaDataset(test_img,dir_mask,img_scale)
+    # train_set=CarvanaDataset(train_img,dir_mask,img_scale,augment=False,aug_dir=aug_img)
+    # val_set=CarvanaDataset(test_img,dir_mask,img_scale)
+    #
+    # loader_args = dict(batch_size=batch_size, num_workers=4, pin_memory=True)
+    # train_loader = DataLoader(train_set, shuffle=True, **loader_args)
+    # val_loader = DataLoader(val_set, shuffle=False, drop_last=True, **loader_args)
 
-    loader_args = dict(batch_size=batch_size, num_workers=4, pin_memory=True)
-    train_loader = DataLoader(train_set, shuffle=True, **loader_args)
-    val_loader = DataLoader(val_set, shuffle=False, drop_last=True, **loader_args)
+    img=Image.open("1_mask.gif")
+    img_array=np.asarray(img)
+    img_tensor=torch.as_tensor(img_array)
+    print(img_tensor.shape)
+    Y=get_edge(img_tensor,save_mask=True)
+    print(Y.shape)
