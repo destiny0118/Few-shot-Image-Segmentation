@@ -4,6 +4,7 @@ from torch import Tensor
 import torch
 from matplotlib import pyplot as plt
 import numpy as np
+import torch.nn.functional as F
 
 '''
     对图像分割边缘划分的准确率
@@ -12,11 +13,10 @@ import numpy as np
 '''
 
 
-def edge_loss(mask_predit: Tensor, mask_true: Tensor, device, edge_weight=50, outline_weight=0, save_mask=False):
+def get_edge(mask_true: Tensor, save_mask=False):
     '''
         将分割图中的实例部分为1，其余为0
     '''
-    # print(mask_true.size(),mask_predit.size())
 
     cmp = mask_true > 0
     cmp = cmp + 0
@@ -64,28 +64,6 @@ def edge_loss(mask_predit: Tensor, mask_true: Tensor, device, edge_weight=50, ou
     edge = torch.bitwise_and(cmp, outline_edge)
     outline = torch.bitwise_xor(outline_edge, edge)
 
-    # print(outline_edge)
-    # print(edge)
-    # print(outline)
-
-    '''
-        给边缘加权
-        TP: 真正例（预测为边缘，实际为边缘）
-        FP：假正例（预测为边缘，实际为轮廓）
-    '''
-    edge = edge * edge_weight
-    TP = edge * mask_predit
-
-    outline=outline*outline_weight
-    FP=outline*mask_predit
-
-    # print("TP:", TP)
-    # print(TP.sum(), edge.sum(), TP.sum() / edge.sum())
-    # print("FP:",FP)
-    # print(FP.sum(),outline.sum(),0 if outline_weight==0 else FP.sum()/outline.sum())
-    # print(10+ (0 if outline_weight==0 else FP.sum()/outline.sum()))
-
-
     # 转换为PIL格式图片
     if save_mask:
         to_image = transforms.ToPILImage()
@@ -93,12 +71,55 @@ def edge_loss(mask_predit: Tensor, mask_true: Tensor, device, edge_weight=50, ou
         img.save("edge.gif")
         plt.imshow(img)
         plt.show()
-    if outline_weight==0:
-        return 1 - TP.sum() / edge.sum()
-    else:
-        return 1 - TP.sum() / edge.sum()+ FP.sum()/outline.sum()
 
-    # if(save):
+    return edge, outline
+
+
+def edge_coeff(input: Tensor, target: Tensor, epison=1e-6):
+    assert input.size() == target.size(),f"input size is {input.size()} target size is {target.size()}"
+    # 遍历channel，计算每个channel的损失
+    if (input.dim() == 2):
+        cross_sum = torch.dot(input.reshape(-1), target.reshape(-1))
+        sets_sum = torch.sum(target)
+        # print("cross_sum:",cross_sum,"sets_sum:",sets_sum)
+        return cross_sum / sets_sum
+    else:
+        score = 0
+        for channel in range(input.shape[0]):
+            score += edge_coeff(input[channel,...], target[channel,...], epison)
+        return score / input.shape[0]
+
+
+def multiclass_edge_coeff(input: Tensor, target: Tensor, edgeWeight: float = 1, outlineWeight: float = 1, epison=1e-6):
+    # 得到每个样本的边缘加权表示
+    # 计算一个批次中的平均损失
+    score = 0
+    for i in range(input.shape[0]):
+        # 得到边缘one_hot码并加权
+        edge, outline = get_edge(target[i, ...])
+        # edge=torch.tensor(edge.copy())
+        # print("edge:",edge)
+        # print("outline:",outline)
+        # edge = F.one_hot(edge, 2)
+        # outline = F.one_hot(outline, 2)
+        # tmp = torch.ones_like(outline)
+        # outline = torch.bitwise_xor(outline, tmp)
+        edge=torch.unsqueeze(edge,dim=0)*edgeWeight
+        outline=torch.unsqueeze(outline,dim=0)*outlineWeight
+        res = torch.cat((outline,edge),0)
+        # print(res.size(),input[i].size(),res)
+
+        score += edge_coeff(input[i, ...], res.float())
+    return score / input.shape[0]
+
+
+def edge_loss(input: Tensor, target: Tensor, edge_weight,outline_weight,multiclass: bool = False):
+    #    input: [batch, channels, h, w]
+    #    target：[batch, h, w]
+    assert input.dim()==4,f"Expected 4 dim, but got input.size:{input.size()}"
+    assert target.dim() == 3, f"Expected 3 dim, but got target.size:{target.size()}"
+    fn = multiclass_edge_coeff if multiclass else edge_coeff
+    return 1 - fn(input, target,edge_weight,outline_weight)
 
 
 def image_trans(img_path):
@@ -119,23 +140,34 @@ def image_trans(img_path):
 
 if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    img_tesnsor = image_trans("1_mask.gif")
+    # img_tesnsor = image_trans("1_mask.gif")
+    #
+    # img_tesnsor = img_tesnsor.to(device=device)
+    #
+    # print(img_tesnsor.size())
 
-    img_tesnsor = img_tesnsor.to(device=device)
-
-    print(img_tesnsor.size())
-
-    true_mask = torch.tensor([[0, 0, 0, 0, 0],
+    true_mask = torch.tensor([[[0, 0, 0, 0, 0],
                               [0, 0, 1, 0, 0],
                               [0, 1, 1, 1, 0],
                               [0, 0, 1, 0, 0],
-                              [0, 0, 0, 0, 0]], dtype=torch.int)
+                              [0, 0, 0, 0, 0]]], dtype=torch.int)
 
-    pred_mask = torch.tensor([[0, 0, 0, 0, 0],
-                              [0, 0, 1, 1, 1],
-                              [0, 0, 1, 1, 0],
-                              [0, 0, 1, 0, 0],
-                              [0, 0, 0, 0, 0]], dtype=torch.int)
+    pred_mask = torch.tensor([
+        [[[0, 0, 1, 0, 0],
+          [0, 1, 0, 1, 0],
+          [1, 0, 1, 0, 1],
+          [0, 1, 0, 1, 0],
+          [0, 0, 1, 0, 0]],
+
+         [[0, 0, 0, 0, 0],
+          [0, 0, 1, 0, 0],
+          [0, 1, 1, 1, 0],
+          [0, 0, 1, 0, 0],
+          [0, 0, 0, 0, 0]]]
+
+    ]
+        , dtype=torch.float)
     true_mask = true_mask.to(device=device)
     pred_mask = pred_mask.to(device=device)
-    edge_loss(pred_mask, true_mask, device, edge_weight=50,outline_weight=10)
+    loss=edge_loss(pred_mask, true_mask,  edge_weight=10, outline_weight=1,multiclass=True)
+    print(loss)

@@ -5,12 +5,24 @@ import os
 import numpy as np
 import torch
 import torch.nn.functional as F
-from PIL import Image
+
+from utils.data_loading import CarvanaDataset
+from unet import UNet, UNet1, UNet2, UNet3
+from utils.utils import plot_img_and_mask
+from os import listdir
+from os.path import  splitext
+from PIL import  Image
 from torchvision import transforms
 
-from utils.data_loading import BasicDataset
-from unet import UNet
-from utils.utils import plot_img_and_mask
+def dataAug(img_dir,aug_dir,aug_num=5):
+    for filename in listdir(img_dir):
+        img_path=img_dir+filename
+        image=Image.open(img_path)
+        aug_op=transforms.ColorJitter(brightness=0, contrast=0, saturation=0, hue=0.5)
+        for i in range(aug_num):
+            aug_img=aug_op(image)
+            aug_img.save(aug_dir+"/"+str(i)+filename)
+
 
 def predict_img(net,
                 full_img,
@@ -18,7 +30,7 @@ def predict_img(net,
                 scale_factor=1,
                 out_threshold=0.5):
     net.eval()
-    img = torch.from_numpy(BasicDataset.preprocess(full_img, scale_factor, is_mask=False))
+    img = torch.from_numpy(CarvanaDataset.preprocess(full_img, scale_factor, is_mask=False))
     img = img.unsqueeze(0)
     img = img.to(device=device, dtype=torch.float32)
 
@@ -48,8 +60,8 @@ def get_args():
     parser = argparse.ArgumentParser(description='Predict masks from input images')
     parser.add_argument('--model', '-m', default='MODEL.pth', metavar='FILE',
                         help='Specify the file in which the model is stored')
-    parser.add_argument('--input', '-i', metavar='INPUT', nargs='+', help='Filenames of input images', required=True)
-    parser.add_argument('--output', '-o', metavar='INPUT', nargs='+', help='Filenames of output images')
+    # parser.add_argument('--input', '-i', metavar='INPUT', nargs='+', help='Filenames of input images', required=True)
+    # parser.add_argument('--output', '-o', metavar='INPUT', nargs='+', help='Filenames of output images')
     parser.add_argument('--viz', '-v', action='store_true',
                         help='Visualize the images as they are processed')
     parser.add_argument('--no-save', '-n', action='store_true', help='Do not save the output masks')
@@ -78,11 +90,19 @@ def mask_to_image(mask: np.ndarray):
 
 
 if __name__ == '__main__':
-    args = get_args()
-    in_files = args.input
-    out_files = get_output_filenames(args)
 
-    net = UNet(n_channels=3, n_classes=2, bilinear=args.bilinear)
+    img_dir = "predict_data/img/"
+    img_out="predict_data/out_img/"
+    aug_dir = "predict_data/aug/"
+    aug_out = "predict_data/out_aug/"
+
+    # dataAug(img_dir, aug_dir)
+
+    args = get_args()
+    # in_files = args.input
+    # out_files = get_output_filenames(args)
+
+    net = UNet(n_channels=3, n_classes=2)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     logging.info(f'Loading model {args.model}')
@@ -93,22 +113,39 @@ if __name__ == '__main__':
 
     logging.info('Model loaded!')
 
-    for i, filename in enumerate(in_files):
+    img_ids = [filename for filename in listdir(img_dir)]
+    aug_ids=[filename for filename in listdir(aug_dir)]
+    for i, filename in enumerate(img_ids):
         logging.info(f'\nPredicting image {filename} ...')
-        img = Image.open(filename)
+        img = Image.open(img_dir+filename)
 
         mask = predict_img(net=net,
                            full_img=img,
                            scale_factor=args.scale,
                            out_threshold=args.mask_threshold,
                            device=device)
+        result = mask_to_image(mask)
+        result.save(img_out+"out_"+filename)
 
-        if not args.no_save:
-            out_filename = out_files[i]
-            result = mask_to_image(mask)
-            result.save(out_filename)
-            logging.info(f'Mask saved to {out_filename}')
+    for i, filename in enumerate(aug_ids):
+        logging.info(f'\nPredicting image {filename} ...')
+        img = Image.open(aug_dir + filename)
 
-        if args.viz:
-            logging.info(f'Visualizing results for image {filename}, close to continue...')
-            plot_img_and_mask(img, mask)
+        mask = predict_img(net=net,
+                           full_img=img,
+                           scale_factor=args.scale,
+                           out_threshold=args.mask_threshold,
+                           device=device)
+        result = mask_to_image(mask)
+        result.save(aug_out + "out_" + filename)
+        # logging.info(f'Mask saved to {out_filename}')
+
+        # if not args.no_save:
+        #     out_filename = out_files[i]
+        #     result = mask_to_image(mask)
+        #     result.save(out_filename)
+        #     logging.info(f'Mask saved to {out_filename}')
+        #
+        # if args.viz:
+        #     logging.info(f'Visualizing results for image {filename}, close to continue...')
+        #     plot_img_and_mask(img, mask)

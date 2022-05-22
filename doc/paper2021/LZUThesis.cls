@@ -145,7 +145,7 @@
 \RequirePackage{amsmath,amsfonts,amssymb,mathrsfs}
 \RequirePackage{graphicx}
 \graphicspath{{figures/}{figure/}{pictures/}
-      {picture/}{pic/}{pics/}{image/}{images/}}
+      {picture/}{pic/}{pics/}{image/}{images/}{aug_imgs/}}
 \RequirePackage[svgnames]{xcolor}
 
 % 下面这个会导致花体，mathcal和mathscr完全相同，正常mathcal会花的轻一些

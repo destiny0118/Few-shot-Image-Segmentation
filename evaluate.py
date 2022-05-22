@@ -5,7 +5,6 @@ from tqdm import tqdm
 from utils.dice_score import multiclass_dice_coeff, dice_coeff
 
 
-
 def evaluate(net, dataloader, device):
     net.eval()
     num_val_batches = len(dataloader)
@@ -41,3 +40,4 @@ def evaluate(net, dataloader, device):
     if num_val_batches == 0:
         return dice_score
     return dice_score / num_val_batches
+

@@ -1,0 +1,224 @@
+\providecommand{\href}[2]{#2}\begingroup\zihao{5}\begin{thebibliography}{10}\linespread{1}\selectfont\setlength{\baselineskip}{16pt}\setlength{\parskip}{0pt}
+\makeatletter
+\providecommand \href@noop [0]{\@secondoftwo}%
+
+\bibitem{lecun1989handwritten}
+LeCun Y, Boser B, Denker J, et~al. { Handwritten digit recognition with a
+  back-propagation network}[J]. {\em Advances in neural information processing
+  systems}, 1989, 2.
+
+\bibitem{krizhevsky2012imagenet}
+Krizhevsky A, Sutskever I, Hinton G~E. { Imagenet classification with deep
+  convolutional neural networks}[J]. {\em Advances in neural information
+  processing systems}, 2012, 25.
+
+\bibitem{long2015fully}
+Long J, Shelhamer E, Darrell T. { Fully convolutional networks for semantic
+  segmentation}[C]. 2015.  3431--3440.
+
+\bibitem{minaee2021image}
+Minaee S, Boykov Y~Y, Porikli F, et~al. { Image segmentation using deep
+  learning: A survey}[J]. {\em IEEE transactions on pattern analysis and
+  machine intelligence}, 2021.
+
+\bibitem{ronneberger2015u}
+Ronneberger O, Fischer P, Brox T. { U-net: Convolutional networks for
+  biomedical image segmentation}[C]. 2015.  234--241.
+
+\bibitem{badrinarayanan2017segnet}
+Badrinarayanan V, Kendall A, Cipolla R. { Segnet: A deep convolutional
+  encoder-decoder architecture for image segmentation}[J]. {\em IEEE
+  transactions on pattern analysis and machine intelligence}, 2017,
+  39(12):2481--2495.
+
+\bibitem{he2017mask}
+He K, Gkioxari G, Doll{\'a}r P, et~al. { Mask r-cnn}[C]. 2017.  2961--2969.
+
+\bibitem{ren2015faster}
+Ren S, He K, Girshick R, et~al. { Faster r-cnn: Towards real-time object
+  detection with region proposal networks}[J]. {\em Advances in neural
+  information processing systems}, 2015, 28.
+
+\bibitem{shorten2019survey}
+Shorten C, Khoshgoftaar T~M. { A survey on image data augmentation for deep
+  learning}[J]. {\em Journal of big data}, 2019, 6(1):1--48.
+
+\bibitem{yang2022image}
+Yang S, Xiao W, Zhang M, et~al. { Image data augmentation for deep learning: A
+  survey}[J]. {\em arXiv preprint arXiv:2204.08610}, 2022.
+
+\bibitem{cubuk2019autoaugment}
+Cubuk E~D, Zoph B, Mane D, et~al. { Autoaugment: Learning augmentation
+  strategies from data}[C]. 2019.  113--123.
+
+\bibitem{cubuk2020randaugment}
+Cubuk E~D, Zoph B, Shlens J, et~al. { Randaugment: Practical automated data
+  augmentation with a reduced search space}[C]. 2020.  702--703.
+
+\bibitem{muller2021trivialaugment}
+M{\"u}ller S~G, Hutter F. { Trivialaugment: Tuning-free yet state-of-the-art
+  data augmentation}[C]. 2021.  774--782.
+
+\bibitem{zhong2020random}
+Zhong Z, Zheng L, Kang G, et~al. { Random erasing data augmentation}[C]. 2020.
+  13001--13008.
+
+\bibitem{zhang2017mixup}
+Zhang H, Cisse M, Dauphin Y~N, et~al. { mixup: Beyond empirical risk
+  minimization}[J]. {\em arXiv preprint arXiv:1710.09412}, 2017.
+
+\bibitem{赵凯琳2021小样本学习研究综述}
+赵凯琳, 靳小龙, 王元卓. { 小样本学习研究综述}[J]. {\em
+  Journal of Software}, 2021, 32(2).
+
+\bibitem{李新叶2020基于深度神经网络的少样本学习综述}
+李新叶, 龙慎鹏, 朱婧. {
+  基于深度神经网络的少样本学习综述}[J]. {\em
+  计算机应用研究}, 2020, 37(8):2241--2247.
+
+\bibitem{lu2020learning}
+Lu J, Gong P, Ye J, et~al. { Learning from very few samples: A survey}[J]. {\em
+  arXiv preprint arXiv:2009.02653}, 2020.
+
+\bibitem{shen2014recent}
+Shen Y, Yan Y, Wang H. { Recent advances on supervised distance metric learning
+  algorithms}[J]. {\em Acta Automatica Sinica}, 2014, 40(12):2673--2686.
+
+\bibitem{bellet2013survey}
+Bellet A, Habrard A, Sebban M. { A survey on metric learning for feature
+  vectors and structured data}[J]. {\em arXiv preprint arXiv:1306.6709}, 2013.
+
+\bibitem{koch2015siamese}
+Koch G, Zemel R, Salakhutdinov R, et~al. { Siamese neural networks for one-shot
+  image recognition}[C]. 2015. ~0.
+
+\bibitem{vinyals2016matching}
+Vinyals O, Blundell C, Lillicrap T, et~al. { Matching networks for one shot
+  learning}[J]. {\em Advances in neural information processing systems}, 2016,
+  29.
+
+\bibitem{snell2017prototypical}
+Snell J, Swersky K, Zemel R. { Prototypical networks for few-shot learning}[J].
+  {\em Advances in neural information processing systems}, 2017, 30.
+
+\bibitem{sung2018learning}
+Sung F, Yang Y, Zhang L, et~al. { Learning to compare: Relation network for
+  few-shot learning}[C]. 2018.  1199--1208.
+
+\bibitem{thrun1998learning}
+Thrun S, Pratt L. { Learning to learn: Introduction and overview}[C].
+  Proceedings of Learning to learn. Springer, 1998: 3--17.
+
+\bibitem{santoro2016meta}
+Santoro A, Bartunov S, Botvinick M, et~al. { Meta-learning with
+  memory-augmented neural networks}[C]. 2016.  1842--1850.
+
+\bibitem{graves2014neural}
+Graves A, Wayne G, Danihelka I. { Neural turing machines}[J]. {\em arXiv
+  preprint arXiv:1410.5401}, 2014.
+
+\bibitem{munkhdalai2017meta}
+Munkhdalai T, Yu H. { Meta networks}[C]. 2017.  2554--2563.
+
+\bibitem{wang2018low}
+Wang Y~X, Girshick R, Hebert M, et~al. { Low-shot learning from imaginary
+  data}[C]. 2018.  7278--7286.
+
+\bibitem{fe2003bayesian}
+Fe-Fei L, et~al. { A bayesian approach to unsupervised one-shot learning of
+  object categories}[C]. 2003.  1134--1141.
+
+\bibitem{fu2018recent}
+Fu Y, Xiang T, Jiang Y~G, et~al. { Recent advances in zero-shot recognition:
+  Toward data-efficient understanding of visual content}[J]. {\em IEEE Signal
+  Processing Magazine}, 2018, 35(1):112--125.
+
+\bibitem{zhang2010ore}
+Zhang G, Liu G, Zhu H, et~al. { Ore image thresholding using bi-neighbourhood
+  otsu's approach}[J]. {\em Electronics letters}, 2010, 46(25):1666--1668.
+
+\bibitem{zhang2011segmentation}
+Zhang G~y, Liu G~z, Zhu H. { Segmentation algorithm of complex ore images based
+  on templates transformation and reconstruction}[J]. {\em International
+  Journal of Minerals, Metallurgy, and Materials}, 2011, 18(4):385--389.
+
+\bibitem{yang2014ore}
+Yang G~q, Wang H~g, Xu W~l, et~al. { Ore particle image region segmentation
+  based on multilevel strategy}[J]. {\em Chin. J. Anal. Lab}, 2014,
+  35(24):202--204.
+
+\bibitem{kirillov2019panoptic}
+Kirillov A, He K, Girshick R, et~al. { Panoptic segmentation}[C]. 2019.
+  9404--9413.
+
+\bibitem{zeiler2014visualizing}
+Zeiler M~D, Fergus R. { Visualizing and understanding convolutional
+  networks}[C]. 2014.  818--833.
+
+\bibitem{noh2015learning}
+Noh H, Hong S, Han B. { Learning deconvolution network for semantic
+  segmentation}[C]. 2015.  1520--1528.
+
+\bibitem{周志华machine}
+周志华. \href@noop {} {{ 机器学习}[M]}. 清华大学出版社, 2016.
+
+\bibitem{milletari2016v}
+Milletari F, Navab N, Ahmadi S~A. { V-net: Fully convolutional neural networks
+  for volumetric medical image segmentation}[C]. 2016.  565--571.
+
+\bibitem{zhang2021dive}
+Zhang A, Lipton Z~C, Li M, et~al. { Dive into deep learning}[J]. {\em arXiv
+  preprint arXiv:2106.11342}, 2021.
+
+\bibitem{ruder2016overview}
+Ruder S. { An overview of gradient descent optimization algorithms}[J]. {\em
+  arXiv preprint arXiv:1609.04747}, 2016.
+
+\bibitem{nielsen2015neural}
+Nielsen M~A. \href@noop {} {{ Neural networks and deep learning}[M]},
+  volume~25. Determination press San Francisco, CA, USA, 2015.
+
+\bibitem{zeiler2012adadelta}
+Zeiler M~D. { Adadelta: an adaptive learning rate method}[J]. {\em arXiv
+  preprint arXiv:1212.5701}, 2012.
+
+\bibitem{zhou2018unet++}
+Zhou Z, Rahman~Siddiquee M~M, Tajbakhsh N, et~al. { Unet++: A nested u-net
+  architecture for medical image segmentation}[C]. Proceedings of Deep learning
+  in medical image analysis and multimodal learning for clinical decision
+  support. Springer, 2018: 3--11.
+
+\bibitem{huang2020unet}
+Huang H, Lin L, Tong R, et~al. { Unet 3+: A full-scale connected unet for
+  medical image segmentation}[C]. 2020.  1055--1059.
+
+\bibitem{he2016deep}
+He K, Zhang X, Ren S, et~al. { Deep residual learning for image
+  recognition}[C]. 2016.  770--778.
+
+\bibitem{zhang2018road}
+Zhang Z, Liu Q, Wang Y. { Road extraction by deep residual u-net}[J]. {\em IEEE
+  Geoscience and Remote Sensing Letters}, 2018, 15(5):749--753.
+
+\bibitem{goodfellow2016deep}
+Goodfellow I, Bengio Y, Courville A. \href@noop {} {{ Deep learning}[M]}. MIT
+  press, 2016.
+
+\bibitem{Azulay2019WhyDD}
+Azulay A, Weiss Y. { Why do deep convolutional networks generalize so poorly to
+  small image transformations?}[J]. {\em J. Mach. Learn. Res.}, 2019,
+  20:184:1--184:25.
+
+\bibitem{tang2020onlineaugment}
+Tang Z, Gao Y, Karlinsky L, et~al. { Onlineaugment: Online data augmentation
+  with less domain knowledge}[C]. 2020.  313--329.
+
+\bibitem{ioffe2015batch}
+Ioffe S, Szegedy C. { Batch normalization: Accelerating deep network training
+  by reducing internal covariate shift}[C]. 2015.  448--456.
+
+\bibitem{szegedy2016rethinking}
+Szegedy C, Vanhoucke V, Ioffe S, et~al. { Rethinking the inception architecture
+  for computer vision}[C]. 2016.  2818--2826.
+
+\end{thebibliography}\endgroup
